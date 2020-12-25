@@ -1,0 +1,4 @@
+docker pull node
+docker info
+docker ps
+docker images
