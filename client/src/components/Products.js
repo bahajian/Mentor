@@ -25,6 +25,34 @@ export default class Products extends Component {
     }
   }
 
+  handleUpdateProduct = async (id, name,password,address) => {
+    // add call to AWS API Gateway update product endpoint here
+    try {
+      const params = {
+        "user_id" : id,
+        "email": name,
+        "password": password,
+        "address": address
+      };
+      console.log("**********************************************");
+      console.log(params);
+      console.log("----------------------------------------------")
+      console.log(name);
+
+      await axios.patch(`${config.api.invokeUrl}/users/${id}`, params);
+      const productToUpdate = [...this.state.products.Users].find(product => product.id === id);
+      const updatedProducts = [...this.state.products.Users].filter(product => product.id !== id);
+      productToUpdate.user_email = name;
+      productToUpdate.user_password = password;
+      productToUpdate.user_address = address;
+      updatedProducts.push(productToUpdate);
+      this.setState({products: updatedProducts});
+    }catch (err) {
+      console.log(`Error updating product: ${err}`);
+    }
+    
+  }
+
   componentDidMount = () => {
     this.fetchProducts();
   }
@@ -44,14 +72,19 @@ export default class Products extends Component {
                 <div className="tile is-ancestor">
                   <div className="tile is-4 is-parent  is-vertical">
                     {
-                    data && data.length > 0
-                    
-                      
-
-                      ? data.map(product => <Product name={product.user_email} id={product.user_id} key={product.user_id} />)
-                      : <div className="tile notification is-warning">No products available</div>
-
-
+                      data && data.length > 0
+                    ? data.map((product) => 
+                    <Product 
+                      isAdmin={true}
+                      handleUpdateProduct={this.handleUpdateProduct}
+                      //handleDeleteProduct={this.handleDeleteProduct}
+                      id={product.user_id}
+                      name={product.user_email}
+                      password={product.user_password}
+                      address={product.user_address}
+                      key={product.user_id}
+                      />)
+                    : <div className="tile notification is-warning">No products available</div>
                     }
                     
                     
